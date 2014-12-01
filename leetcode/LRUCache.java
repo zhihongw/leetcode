@@ -45,7 +45,9 @@ public class LRUCache {
 	}
 	
 	public void moveToTop(CacheEntity en) {
-		if(tail==en&&en.prev!=null)
+		if (queue==en)
+			return;
+		if(tail==en)
 			tail = en.prev;
 		CacheEntity next=en.next;
 		CacheEntity prev=en.prev;
@@ -55,8 +57,7 @@ public class LRUCache {
 			next.prev=prev;
 		en.prev=null;
 		en.next=queue;
-		if(queue!=null)
-			queue.prev=en;
+		queue.prev=en;
 		queue=en;
 	}
 	
@@ -83,20 +84,22 @@ public class LRUCache {
 			moveToTop(en);
 		} else {
 			if(map.size()==capacity) {
-				if (tail.prev!=null)
-					tail.prev.next=null;
 				map.remove(tail.key);
-				if (map.size()>0)
+				if (tail.prev!=null) {
+					tail.prev.next=null;
 					tail=tail.prev;
-				else 
+				}
+				else {
 					tail = null;
-				tail.next=null;
+					queue = null;
+				}
 			}
 			CacheEntity entity = new CacheEntity(key, value, null, null);
+			if (queue==null) {
+				queue = entity;
+				tail = queue;
+			}
 			moveToTop(entity);
-
-			if (tail==null)
-				tail=queue;
 			map.put(key, entity);
 		}
 	}
